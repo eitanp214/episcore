@@ -1,0 +1,25 @@
+# Environment
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+
+# Derived data — regenerate with src/run_embed.py, never commit
+out/embeddings/
+out/pairs/
+out/page_assets.json
+out/findings.html
+
+# Reports are cheap to regenerate and noisy in diffs
+out/report_*.json
+out/confidence_*.json
+out/novelty_*.json
+out/fixture_report.json
+
+# Synthetic fixture — regenerate with tests/make_fixture.py
+data/
+
+# Local model / dataset caches
+hf-cache/
+*.npy
+*.parquet
