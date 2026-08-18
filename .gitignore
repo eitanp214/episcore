@@ -23,3 +23,10 @@ data/
 hf-cache/
 *.npy
 *.parquet
+
+# --- ruflo artifacts (local agent workspace, not source) ---
+.claude/
+.claude-flow/
+.swarm/
+ruvector.db
+.mcp.json

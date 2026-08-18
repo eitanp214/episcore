@@ -54,6 +54,7 @@ def list_shards(
     max_factories: int | None = None,
     shards_per_worker: int = 1,
     workers_per_factory: int = 1,
+    factory_offset: int = 0,
 ) -> list[ShardRef]:
     """List shards, spread across factories rather than concentrated in one.
 
@@ -67,6 +68,7 @@ def list_shards(
     factory_dirs = sorted(
         p for p in fs.ls(root, detail=False) if "/factory_" in p
     )
+    factory_dirs = factory_dirs[factory_offset:]
     if max_factories is not None:
         factory_dirs = factory_dirs[:max_factories]
 

@@ -13,6 +13,7 @@ from __future__ import annotations
 import argparse
 import sys
 import time
+from itertools import islice
 from pathlib import Path
 
 import numpy as np
@@ -37,7 +38,18 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--factories", type=int, default=10, help="gated source only")
     parser.add_argument("--workers", type=int, default=8)
     parser.add_argument("--shards", type=int, default=1, help="gated source only")
+    parser.add_argument(
+        "--factory-offset", type=int, default=0,
+        help="skip the first N factories (gated source) - for resuming",
+    )
     parser.add_argument("--max-clips", type=int, default=None, help="cap per unit")
+    parser.add_argument(
+        "--max-frames",
+        type=int,
+        default=None,
+        help="cap keyframes decoded per clip; decoding is the bottleneck on "
+             "long clips, so this trades sample depth for wall-clock directly",
+    )
     parser.add_argument(
         "--worker-offset",
         type=int,
@@ -64,7 +76,11 @@ def _persist(vectors: list[np.ndarray], rows: list[dict], tag: str):
 
     tmp_emb = emb_path.with_suffix(".npy.tmp")
     tmp_man = man_path.with_suffix(".parquet.tmp")
-    np.save(tmp_emb, matrix)
+    # np.save appends '.npy' unless the path already ends in it, which would
+    # write to <tag>.npy.tmp.npy and leave the rename below with no source.
+    # Handing it an open file object suppresses that.
+    with open(tmp_emb, "wb") as handle:
+        np.save(handle, matrix)
     manifest.to_parquet(tmp_man, index=False)
 
     tmp_emb.replace(emb_path)
@@ -92,6 +108,7 @@ def resolve_source(args: argparse.Namespace):
         max_factories=args.factories,
         shards_per_worker=args.shards,
         workers_per_factory=args.workers,
+        factory_offset=args.factory_offset,
     )
     return units, stream_shard
 
@@ -122,12 +139,20 @@ def main() -> int:
         frame_count = 0
         shard_start = time.time()
 
-        try:
-            for sample in stream_fn(shard):
-                if args.max_clips and clip_count >= args.max_clips:
-                    break
+        # islice, not a break inside the loop: the generator downloads the
+        # next clip before control returns, so checking the cap after the
+        # yield pulls one extra 200 MB clip per unit and throws it away.
+        source = stream_fn(shard)
+        if args.max_clips:
+            source = islice(source, args.max_clips)
 
-                frames = sample_frames(sample.video)
+        try:
+            for sample in source:
+                frames = (
+                    sample_frames(sample.video, max_frames=args.max_frames)
+                    if args.max_frames
+                    else sample_frames(sample.video)
+                )
                 clip_count += 1
                 if len(frames) == 0:
                     continue

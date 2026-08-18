@@ -9,12 +9,13 @@ workers, 192,900 clips, 1080p/30fps H.265, ~18 TB.
 
 ## Status
 
-**Method validated, scope limited.** Measured on one factory (051, 8 workers,
-416 clips). The embedding is confirmed to discriminate on this footage — it
-identifies individual workstations at 92.9% against 14.3% chance — so the
-figure is not an artifact of CLIP collapsing industrial interiors. What is
-untested is whether it *generalises*: the cross-factory run has not happened.
-See [The validation gate](#the-validation-gate).
+**Method validated across factories; figure measured on one.** The redundancy
+number comes from factory 051 (8 workers, 416 clips). The embedding it relies
+on has now been checked against **six physically distinct factories**:
+separation +0.155 and **zero of 20,000 cross-factory pairs** clear the
+duplicate threshold, so the figure is not an artifact of CLIP collapsing
+industrial interiors. What remains untested is whether the *figure itself*
+generalises to other plants. See [The validation gate](#the-validation-gate).
 
 ## Result so far
 
@@ -91,6 +92,19 @@ Measured on factory 051 (single-factory fallback, cross-*worker* control):
 Separation +0.107, zero false duplicates. CLIP does discriminate here, and
 0.92 sits above the 99th percentile of random same-worker pairs — a
 conservative threshold.
+
+### Cross-factory control (`validate.py`, 6 factories)
+
+The decisive test. Its pass criteria were written into the code before the
+gated data was reachable: separation above 0.10, and under 1% of
+cross-factory pairs clearing the threshold.
+
+| scope | mean | p95 | p99 | >=0.92 |
+|---|---|---|---|---|
+| same worker | 0.767 | 0.907 | 0.935 | 2.62% |
+| different factory | 0.612 | 0.751 | 0.798 | **0.00%** |
+
+Separation **+0.155**. Not one pair in twenty thousand. PASS.
 
 ### Workstation identification (`separability.py`)
 

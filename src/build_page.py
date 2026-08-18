@@ -109,8 +109,8 @@ def distribution_svg() -> str:
         return left + (v - lo) / (hi - lo) * width
 
     rows = [
-        ("same worker", 0.709, 0.854, 0.893, "acc"),
-        ("different worker", 0.602, 0.699, 0.736, "sig"),
+        ("same worker", 0.767, 0.907, 0.935, "acc"),
+        ("different factory", 0.612, 0.751, 0.798, "sig"),
     ]
     out, y = [], 22
     for name, mean, p95, p99, cls in rows:
@@ -125,7 +125,7 @@ def distribution_svg() -> str:
         )
         y += 62
     thr = px(0.92)
-    return f"""<svg viewBox="0 0 720 {y + 24}" role="img" aria-label="Same-worker similarity averages 0.71 and different-worker 0.60; the 0.92 threshold sits above both distributions">
+    return f"""<svg viewBox="0 0 720 {y + 24}" role="img" aria-label="Same-worker similarity averages 0.77 and different-factory 0.61; the 0.92 threshold sits above both distributions">
   {''.join(out)}
   <line x1="{thr:.1f}" y1="4" x2="{thr:.1f}" y2="{y - 26}" class="marker"/>
   <text x="{thr:.1f}" y="{y + 2}" class="callout" text-anchor="middle">threshold 0.92</text>
@@ -370,6 +370,8 @@ h1 {{
   padding: 14px 18px; display: flex; gap: 13px; align-items: baseline;
   font-size: 15px; line-height: 1.55;
 }}
+.status.ok {{ border-color: var(--accent); background: var(--accent-soft); }}
+.status.ok b {{ color: var(--accent); }}
 .status b {{
   font-family: ui-monospace, "SF Mono", "Cascadia Mono", Menlo, Consolas, monospace;
   font-size: 11px; letter-spacing: .1em; text-transform: uppercase;
@@ -505,12 +507,12 @@ footer {{
   <p class="standfirst">Everyone agrees curation beats scale for robot training data.
   Nobody publishes the number that would let a buyer act on it. Here is one — and the
   finding that the number itself is the wrong unit.</p>
-  <div class="status">
-    <b>Scope-limited</b>
-    <span>Measured on one factory. The method is validated — the embedding
-    identifies individual workstations at 92.9% against 14.3% chance — but whether
-    the figure generalises across factories is untested. Read this as a method and
-    its evidence, not a settled claim about the corpus.</span>
+  <div class="status ok">
+    <b>Method validated</b>
+    <span>The redundancy figure is measured on one factory, but the embedding it
+    relies on is now confirmed across six physically distinct factories: zero of
+    20,000 cross-factory pairs register as duplicates. What remains untested is
+    whether the <i>figure</i> generalises, not whether the method is sound.</span>
   </div>
 </header>
 
@@ -655,14 +657,19 @@ footer {{
   embedding space, everything looks alike and the redundancy figure is measuring a
   blind spot rather than a corpus.</p>
   <p>The corpus answers this itself. It spans 85 physically distinct factories, which
-  is a free control: frames from different environments must be clearly less similar
-  than frames from the same worker.</p>
+  is a free control: frames from different plants must be clearly less similar than
+  frames from the same worker. Six factories were sampled to test it.</p>
   <div class="figure">
     {distribution_svg()}
-    <p class="figcap">Random-pair cosine similarity, 20,000 pairs per scope. Dots mark
-    mean, p95 and p99. Separation +0.107; zero different-worker pairs clear 0.92, and
-    the threshold sits above the 99th percentile of same-worker pairs.</p>
+    <p class="figcap">Random-pair cosine similarity, 20,000 pairs per scope, across
+    six factories. Dots mark mean, p95 and p99. Separation +0.155, and
+    <b>zero</b> cross-factory pairs clear 0.92 — the threshold sits above the 99th
+    percentile of same-worker pairs.</p>
   </div>
+  <p>The pass criteria were written into <code>validate.py</code> before the gated
+  data was accessible: separation above 0.10, and under 1% of cross-factory pairs
+  clearing the threshold. Measured: 0.155, and 0.00%. Not one pair in twenty
+  thousand.</p>
   <h3>A sharper version of the same question</h3>
   <p>Mean separation is a blunt instrument. The direct test: if the embedding had
   collapsed this footage, it could not tell workstations <i>inside a single factory</i>
@@ -679,10 +686,9 @@ footer {{
   92.9% says the embedding carries fine-grained discriminative structure on exactly
   this footage — which is the property the redundancy metric depends on.</p>
   <p><b>What remains open.</b> Each worker has their own fisheye intrinsics, so part of
-  that signal may be lens rather than scene. And one factory is still one factory: the
-  method is validated, the <i>scope</i> is not. The cross-factory run tests whether the
-  figure generalises — if separation drops below 0.10 or more than 1% of
-  different-factory pairs clear the threshold, the number does not ship.</p>
+  that signal may be lens rather than scene. And validating the method is not the same
+  as validating the number: 27.2% is what factory 051 measures, and whether other
+  plants land near it is a separate question this does not answer.</p>
 </section>
 
 <section>
