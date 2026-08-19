@@ -30,3 +30,6 @@ hf-cache/
 .swarm/
 ruvector.db
 .mcp.json
+
+# Internal: target list, outreach drafts, roadmap. Backed up in D:/episcore-private
+notes/
