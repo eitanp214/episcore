@@ -7,6 +7,9 @@ to train on.
 Built against **Egocentric-10K** (Build AI, Apache-2.0): 85 factories, 2,138
 workers, 192,900 clips, 1080p/30fps H.265, ~18 TB.
 
+**[Read the findings](https://eitanp214.github.io/episcore/)** — the numbers, the charts, the motion-blur
+confound that inverted the similarity ranking, and both validation gates.
+
 ## Status
 
 **Method validated across factories; figure measured on one.** The redundancy
