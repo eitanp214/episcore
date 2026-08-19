@@ -778,8 +778,11 @@ footer {{
   <h2>Reproduce it <span class="n">08</span></h2>
   <p>Runs on a GTX 1050 Ti in about an hour, network-bound. Nothing is downloaded:
   shards stream from the Hub, frames decode in memory, only embeddings persist.</p>
-<pre>pip install -r requirements.txt
+<pre>git clone https://github.com/eitanp214/episcore.git
+cd episcore
+pip install -r requirements.txt
 python src/pipeline.py --tag myrun --source subset</pre>
+  <p>Source, tests and full method notes: <a href="https://github.com/eitanp214/episcore">github.com/eitanp214/episcore</a></p>
   <p>The validation gate blocks the report if the embedding fails to discriminate on
   your footage. That is deliberate, and not skippable from the entry point.</p>
 </section>
