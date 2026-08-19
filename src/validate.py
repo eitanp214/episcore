@@ -130,16 +130,28 @@ def main() -> int:
     )
 
     # Control group: different factory when available, else different worker.
+    #
+    # Sampled across ALL factory pairs, not one factory against the rest. The
+    # earlier version compared whichever factory sorted first with everything
+    # else, which makes the result depend on an alphabetical accident -- it
+    # read 0.155 that way against 0.175 balanced, on the same data.
     if single_factory:
         control = cross_worker
         control_name = "diff_worker (fallback control)"
     else:
-        first_half = idx[factory == factories[0]]
-        rest = idx[factory != factories[0]]
-        control = _sample_pairs(
-            rng, embeddings, first_half, rest, exclude_identical=False
-        )
-        control_name = "diff_factory"
+        import itertools
+
+        pairs = list(itertools.combinations(factories, 2))
+        per_pair = max(N_PAIRS // max(len(pairs), 1), 1)
+        chunks = []
+        for f1, f2 in pairs:
+            p1, p2 = idx[factory == f1], idx[factory == f2]
+            if p1.size and p2.size:
+                a = embeddings[rng.choice(p1, size=per_pair)].astype(np.float32)
+                b = embeddings[rng.choice(p2, size=per_pair)].astype(np.float32)
+                chunks.append(np.einsum("ij,ij->i", a, b))
+        control = np.concatenate(chunks) if chunks else np.empty(0, dtype=np.float32)
+        control_name = f"diff_factory ({len(pairs)} pairs)"
 
     rows = [
         describe("same_worker", same_worker),
