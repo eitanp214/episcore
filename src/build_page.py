@@ -504,9 +504,9 @@ footer {{
     <span>7,993 frames</span><span>8 workers</span><span>factory 051</span>
   </div>
   <h1>What fraction of a video corpus is content it already contains?</h1>
-  <p class="standfirst">Everyone agrees curation beats scale for robot training data.
-  Nobody publishes the number that would let a buyer act on it. Here is one — and the
-  finding that the number itself is the wrong unit.</p>
+  <p class="standfirst">Deduplication tools are mature and mostly free. What they
+  report is a corpus-level number — and on this corpus that number hides a 6&times;
+  spread between the individual people who shot the footage.</p>
   <div class="status ok">
     <b>Method validated</b>
     <span>The redundancy figure is measured on one factory, but the embedding it
@@ -517,7 +517,26 @@ footer {{
 </header>
 
 <section>
-  <h2>The measurement <span class="n">01</span></h2>
+  <h2>What already exists <span class="n">01</span></h2>
+  <p>Near-duplicate detection is not an open problem. Before any of the below is
+  useful, it is worth knowing what ships today:</p>
+  <table>
+    <thead><tr><th>tool</th><th>capability</th><th>availability</th></tr></thead>
+    <tbody>
+      <tr><td>FiftyOne</td><td>find_duplicates, uniqueness scoring</td><td>open source, 2.8M installs</td></tr>
+      <tr><td>Cleanlab Datalab</td><td>near-duplicate detection</td><td>open source</td></tr>
+      <tr><td>Encord Active</td><td>Uniqueness metric, side-by-side review</td><td>commercial</td></tr>
+      <tr><td>Lightly</td><td>curation and selection</td><td>commercial</td></tr>
+    </tbody>
+  </table>
+  <p>To deduplicate an image dataset, use one of those. What follows is narrower:
+  the same measurement <b>split by who captured the footage</b>, two gates that
+  refuse to report a figure the embedding cannot support, and the confounds that
+  turned up on the way — published rather than omitted.</p>
+</section>
+
+<section>
+  <h2>The measurement <span class="n">02</span></h2>
   <p class="lede">A frame is <b>redundant at threshold t</b> if its cosine similarity
   to any <i>earlier</i> frame in the corpus is at least t.</p>
   <p>That definition is computed threshold-independently, which matters more than it
@@ -557,7 +576,7 @@ footer {{
 </section>
 
 <section>
-  <h2>The average is the least useful number here <span class="n">02</span></h2>
+  <h2>The average is the least useful number here <span class="n">03</span></h2>
   <p class="lede">Redundancy ranges from <b>7.4% to 46.0%</b> depending on which
   operator's footage you bought — a {SPREAD['max'] / SPREAD['min']:.1f}× spread around
   the corpus mean.</p>
@@ -577,7 +596,7 @@ footer {{
 </section>
 
 <section>
-  <h2>Does buying more hours stop paying? <span class="n">03</span></h2>
+  <h2>Does buying more hours stop paying? <span class="n">04</span></h2>
   <p>The natural follow-up: if an operator repeats themselves, there should be a
   point where their next clip adds nothing. So — for each clip in collection order,
   what share of its frames are novel against everything that operator has already
@@ -599,7 +618,7 @@ footer {{
 </section>
 
 <section>
-  <h2>Motion blur is a confound, not noise <span class="n">04</span></h2>
+  <h2>Motion blur is a confound, not noise <span class="n">05</span></h2>
   <p>This was not in the plan. It surfaced from rendering sampled pairs and actually
   looking at them — and it is the reason the sensitivity sweep below is published
   alongside the headline rather than produced on request.</p>
@@ -651,7 +670,7 @@ footer {{
 </section>
 
 <section>
-  <h2>Does the embedding see this footage? <span class="n">05</span></h2>
+  <h2>Does the embedding see this footage? <span class="n">06</span></h2>
   <p>The obvious objection: CLIP was trained on web photography, not fisheye
   industrial video. If factory interiors collapse into a narrow region of the
   embedding space, everything looks alike and the redundancy figure is measuring a
@@ -692,7 +711,7 @@ footer {{
 </section>
 
 <section>
-  <h2>What this does not show <span class="n">06</span></h2>
+  <h2>What this does not show <span class="n">07</span></h2>
   <ul>
     <li><b>One factory.</b> Factory work is also the easy case — repetitive manual
     labour should produce repetitive footage. This says nothing about kitchen or
@@ -714,7 +733,7 @@ footer {{
 </section>
 
 <section>
-  <h2>Questions this answers <span class="n">07</span></h2>
+  <h2>Questions this answers <span class="n">08</span></h2>
 
   <div class="qa">
     <h3>How do you measure redundancy in a video training corpus?</h3>
@@ -775,7 +794,7 @@ footer {{
 </section>
 
 <section>
-  <h2>Reproduce it <span class="n">08</span></h2>
+  <h2>Reproduce it <span class="n">09</span></h2>
   <p>Runs on a GTX 1050 Ti in about an hour, network-bound. Nothing is downloaded:
   shards stream from the Hub, frames decode in memory, only embeddings persist.</p>
 <pre>git clone https://github.com/eitanp214/episcore.git
@@ -789,8 +808,9 @@ python src/pipeline.py --tag myrun --source subset</pre>
 
 <footer>
   <p>The interesting number was never 27%. It is that two operators on the same
-  factory floor, sold at the same rate, differ by 6× in what you are paying for
-  twice — and nobody currently reports it.</p>
+  factory floor, sold at the same rate, differ by 6&times; in what you are paying for
+  twice. Dedup tooling is mature; it reports on corpora, not on the people who
+  filled them.</p>
 </footer>
 </div>
 """
