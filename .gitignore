@@ -33,3 +33,12 @@ ruvector.db
 
 # Internal: target list, outreach drafts, roadmap. Backed up in D:/episcore-private
 notes/
+
+# One-off patch and verification scripts, not source
+fix_*.py
+patch_*.py
+verify_*.sh
+purge_*.sh
+audit_*.sh
+check_live.sh
+COMMIT_MSG.txt

@@ -1,22 +1,22 @@
-# PyTorch must come from the CUDA index, not PyPI:
-#   pip install torch==2.7.1+cu118 torchvision==0.22.1+cu118 \
-#       --index-url https://download.pytorch.org/whl/cu118
+# PyTorch resolves to a working build for the host platform. For a specific
+# CUDA build, install it first from the PyTorch index, then run this file:
+#   pip install torch torchvision --index-url https://download.pytorch.org/whl/cu118
 #
-# cu118 is chosen for Pascal-era cards (GTX 10xx). Newer CUDA builds work on
-# newer GPUs; nothing else in this project depends on the choice.
-torch==2.7.1+cu118
-torchvision==0.22.1+cu118
+# cu118 suits Pascal-era cards (GTX 10xx). Newer GPUs want a newer CUDA;
+# nothing else here depends on the choice.
+torch>=2.0
+torchvision>=0.15
 
 open-clip-torch
 huggingface-hub
 
-av==18.0.0            # H.265 decode, bundles its own ffmpeg
-faiss-cpu==1.15.0     # exact inner-product search; corpus fits in RAM
-webdataset==1.0.2
+av>=18                # H.265 decode, bundles its own ffmpeg
+faiss-cpu>=1.9        # exact inner-product search; corpus fits in RAM
+webdataset>=1.0
 
-numpy==2.4.4
-pandas==3.0.5
-pyarrow==25.0.0       # parquet manifests
-pillow==12.2.0
-scikit-learn==1.9.0
-tqdm==4.70.0
+numpy>=1.24
+pandas>=2.0
+pyarrow>=14           # parquet manifests
+pillow>=10
+scikit-learn>=1.3
+tqdm
